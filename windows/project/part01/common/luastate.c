@@ -31,10 +31,11 @@ typedef struct LG {
     global_State g;
 } LG;
 
-static void stack_init(struct lua_State* L) {
+static void stack_init(struct lua_State* L) {   
     L->stack = (StkId)luaM_realloc(L, NULL, 0, LUA_STACKSIZE * sizeof(TValue));
     L->stack_size = LUA_STACKSIZE;
     L->stack_last = L->stack + LUA_STACKSIZE - LUA_EXTRASTACK;
+    // 至于EXTRA_SPACE的作用，我个人的观点是避免爆栈时（L->top指针超越L->stack_last），访问了其他内存区域破坏其他内存块，这里被作为一个容错的缓冲区。
     L->next = L->previous = NULL;
     L->status = LUA_OK;
     L->errorjmp = NULL;
@@ -102,6 +103,7 @@ void lua_close(struct lua_State* L) {
     (*g->frealloc)(g->ud, fromstate(L1), sizeof(LG), 0);
 }
 
+// 参数入栈，lua_TValue
 void setivalue(StkId target, int integer) {
     target->value_.i = integer;
     target->tt_ = LUA_NUMINT;
@@ -170,7 +172,7 @@ void lua_pushlightuserdata(struct lua_State* L, void* p) {
     setpvalue(L->top, p);
     increase_top(L);
 }
-
+// 获取栈上的值
 static TValue* index2addr(struct lua_State* L, int idx) {
     if (idx >= 0) {
         assert(L->ci->func + idx < L->ci->top);
@@ -221,6 +223,7 @@ int lua_isnil(struct lua_State* L, int idx) {
     return addr->tt_ == LUA_TNIL;
 }
 
+// 设置栈顶指针
 int lua_gettop(struct lua_State* L) {
     return cast(int, L->top - (L->ci->func + 1));
 }

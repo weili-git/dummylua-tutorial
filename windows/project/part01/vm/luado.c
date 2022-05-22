@@ -80,7 +80,7 @@ void luaD_growstack(struct lua_State* L, int size) {
     }
 }
 
-void luaD_throw(struct lua_State* L, int error) {
+void luaD_throw(struct lua_State* L, int error) {// 抛出异常
     struct global_State* g = G(L);
     if (L->errorjmp) {
         L->errorjmp->status = error;
@@ -133,10 +133,10 @@ static struct CallInfo* next_ci(struct lua_State* L, StkId func, int nresult) {
 // if we call a lua function, just prepare for call it
 int luaD_precall(struct lua_State* L, StkId func, int nresult) {
     switch(func->tt_) {
-        case LUA_TLCF: {
+        case LUA_TLCF: {// 目前只涉及调用C函数
             lua_CFunction f = func->value_.f;
 
-            ptrdiff_t func_diff = savestack(L, func);
+            ptrdiff_t func_diff = savestack(L, func);   // pointer difference result
             luaD_checkstack(L, LUA_MINSTACK);
             func = restorestack(L, func_diff);
 
@@ -229,9 +229,9 @@ int luaD_poscall(struct lua_State* L, StkId first_result, int nresult) {
 
     return LUA_OK;
 }
-
+// 函数调用
 int luaD_call(struct lua_State* L, StkId func, int nresult) {
-    if (++L->ncalls > LUA_MAXCALLS) {
+    if (++L->ncalls > LUA_MAXCALLS) {   // 最大调用数200
         luaD_throw(L, 0);
     }
 

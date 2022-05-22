@@ -28,23 +28,24 @@ typedef struct lua_State lua_State;
 typedef LUA_INTEGER lua_Integer;
 typedef LUA_NUMBER lua_Number;
 typedef unsigned char lu_byte;
-typedef int (*lua_CFunction)(lua_State* L);
+typedef int (*lua_CFunction)(lua_State* L);     // 函数指针， 形参lua_State* 类型，返回值类型是lua_State
 typedef void* (*lua_Alloc)(void* ud, void* ptr, size_t osize, size_t nsize);
 
+// 细分类型，大类型0000-1000占用第四位，那么通过高位来细分。存储在tt_变量中
 // lua number type 
 #define LUA_NUMINT (LUA_TNUMBER | (0 << 4))
 #define LUA_NUMFLT (LUA_TNUMBER | (1 << 4))
 
 // lua function type 
 #define LUA_TLCL (LUA_TFUNCTION | (0 << 4))
-#define LUA_TLCF (LUA_TFUNCTION | (1 << 4))
+#define LUA_TLCF (LUA_TFUNCTION | (1 << 4)) // light c function
 #define LUA_TCCL (LUA_TFUNCTION | (2 << 4))
 
 // string type 
 #define LUA_LNGSTR (LUA_TSTRING | (0 << 4))
 #define LUA_SHRSTR (LUA_TSTRING | (1 << 4))
 
-typedef union lua_Value {
+typedef union lua_Value {   // 相同内存位置存储不同数据类型
     void* p;
     int b;
     lua_Integer i;
@@ -52,9 +53,13 @@ typedef union lua_Value {
     lua_CFunction f;
 } Value;
 
-typedef struct lua_TValue {
+typedef struct lua_TValue { // 包含类型的值
     Value value_;
     int tt_;
 } TValue;
 
 #endif 
+
+
+// int (*func)(int *p);         func是函数指针，返回值int
+// int (*func[5])(int *);       func是数组，元素是函数指针，返回值int

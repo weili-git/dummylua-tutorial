@@ -9,9 +9,9 @@ static int test_main01(struct lua_State* L) {
 
 void p1_test_result01() { // nwant = 0; and nresult = 0;
     struct lua_State* L = luaL_newstate();
-    luaL_pushcfunction(L, &test_main01);
+    luaL_pushcfunction(L, &test_main01);    // 函数test_main01压栈
     luaL_pushinteger(L, 1);
-    luaL_pcall(L, 1, 0);
+    luaL_pcall(L, 1, 0);    // 1个参数，0个返回值
     luaL_close(L);
 }
 
